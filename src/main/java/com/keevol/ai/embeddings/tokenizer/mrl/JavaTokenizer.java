@@ -47,7 +47,7 @@ public class JavaTokenizer implements AutoCloseable {
     private static final MethodHandle encoding_free_array;
 
     private static final String cacheLibsPath = ".keevol/cache/libs/";
-    private static final File libsCacheDir = new File(System.getProperty("user.home"), cacheLibsPath);
+    private static final File libsCacheDir = new File(System.getProperty("user.home") + File.separator + cacheLibsPath);
 
     // --- Static initializer to load the library and look up symbols ---
     static {
@@ -161,9 +161,9 @@ public class JavaTokenizer implements AutoCloseable {
                 // 2. 当前目录
                 libName + extension,
                 "libs/" + libName + extension,
-                new File(System.getProperty("user.home"), cacheLibsPath + libName + extension).getAbsolutePath(),
+                new File(libsCacheDir, libName + extension).getAbsolutePath(),
                 // 绝对路径（向后兼容）
-                new File(System.getProperty("user.home"), cacheLibsPath + "libjava_tokenizer_bridge" + extension).getAbsolutePath()
+                new File(libsCacheDir, "libjava_tokenizer_bridge" + extension).getAbsolutePath()
         };
 
         for (String path : possiblePaths) {
