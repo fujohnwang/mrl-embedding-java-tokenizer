@@ -20,6 +20,7 @@ package com.keevol.ai.embeddings.tokenizer.mrl;
  */
 
 import com.keevol.goodies.ClasspathResources;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,14 +46,14 @@ public class JavaTokenizer implements AutoCloseable {
     private static final MethodHandle encoding_get_attention_mask;
     private static final MethodHandle encoding_free_array;
 
-    private static final File libsCacheDir = new File(System.getProperty("user.home"), ".keevol/cache/libs/");
+    private static final String cacheLibsPath = ".keevol/cache/libs/";
+    private static final File libsCacheDir = new File(System.getProperty("user.home"), cacheLibsPath);
 
     // --- Static initializer to load the library and look up symbols ---
     static {
         try {
-            if (!libsCacheDir.exists() && !libsCacheDir.mkdirs()) {
-                throw new IOException("fails to prepare lib cache dir");
-            }
+            logger.info("mkdirs if necessary: {}", libsCacheDir.getAbsolutePath());
+            FileUtils.forceMkdir(libsCacheDir);
             try {
                 ClasspathResources.copyToLocalFS("/libs/libjava_tokenizer_bridge-macos-arm64.dylib", libsCacheDir);
                 ClasspathResources.copyToLocalFS("/libs/libjava_tokenizer_bridge-macos-x64.dylib", libsCacheDir);
@@ -160,9 +161,9 @@ public class JavaTokenizer implements AutoCloseable {
                 // 2. 当前目录
                 libName + extension,
                 "libs/" + libName + extension,
-                new File(System.getProperty("user.home"), ".keevol/ai/cache/libs/" + libName + extension).getAbsolutePath(),
+                new File(System.getProperty("user.home"), cacheLibsPath + libName + extension).getAbsolutePath(),
                 // 绝对路径（向后兼容）
-                new File(System.getProperty("user.home"), ".keevol/ai/cache/libs/libjava_tokenizer_bridge" + extension).getAbsolutePath()
+                new File(System.getProperty("user.home"), cacheLibsPath + "libjava_tokenizer_bridge" + extension).getAbsolutePath()
         };
 
         for (String path : possiblePaths) {
