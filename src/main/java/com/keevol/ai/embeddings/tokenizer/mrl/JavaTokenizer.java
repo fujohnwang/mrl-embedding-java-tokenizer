@@ -50,16 +50,19 @@ public class JavaTokenizer implements AutoCloseable {
     // --- Static initializer to load the library and look up symbols ---
     static {
         try {
-            if (!libsCacheDir.exists()) {
-                if (libsCacheDir.mkdirs()) {
-                    throw new IOException("fails to prepare lib cache dir");
-                }
+            if (!libsCacheDir.exists() && !libsCacheDir.mkdirs()) {
+                throw new IOException("fails to prepare lib cache dir");
             }
-            ClasspathResources.copyToLocalFS("/libs/libjava_tokenizer_bridge-macos-arm64.dylib", libsCacheDir);
-            ClasspathResources.copyToLocalFS("/libs/libjava_tokenizer_bridge-macos-x64.dylib", libsCacheDir);
+            try {
+                ClasspathResources.copyToLocalFS("/libs/libjava_tokenizer_bridge-macos-arm64.dylib", libsCacheDir);
+                ClasspathResources.copyToLocalFS("/libs/libjava_tokenizer_bridge-macos-x64.dylib", libsCacheDir);
+            } catch (IOException e) {
+                logger.warn("dynamic lib exists, ignore copy.");
+            }
         } catch (IOException e) {
             logger.warn("fails to extract dynamic libs to local cache dir: {}", e.toString());
         }
+
 
         // 自动检测平台并加载对应的动态库
         String libPath = detectAndLoadLibrary();
