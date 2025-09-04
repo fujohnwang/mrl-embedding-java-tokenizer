@@ -46,22 +46,28 @@ public class JavaTokenizer implements AutoCloseable {
     private static final MethodHandle encoding_get_attention_mask;
     private static final MethodHandle encoding_free_array;
 
-    private static final String cacheLibsPath = ".keevol/cache/libs/";
-    private static final File libsCacheDir = new File(System.getProperty("user.home") + File.separator + cacheLibsPath);
+    private static final File libsCacheDir = new File(System.getProperty("user.home") + File.separator + ".keevol/cache/libs/");
 
     // --- Static initializer to load the library and look up symbols ---
     static {
         try {
             logger.info("mkdirs if necessary: {}", libsCacheDir.getAbsolutePath());
+            if (libsCacheDir.exists() && libsCacheDir.isFile()) {
+                logger.info("delete cache dir as its stale false state as a file.");
+                FileUtils.forceDelete(libsCacheDir);
+            }
+            logger.info("recreate cache dir");
             FileUtils.forceMkdir(libsCacheDir);
             try {
-                ClasspathResources.copyToLocalFS("/libs/libjava_tokenizer_bridge-macos-arm64.dylib", libsCacheDir);
-                ClasspathResources.copyToLocalFS("/libs/libjava_tokenizer_bridge-macos-x64.dylib", libsCacheDir);
+                String macosArmLib = "libjava_tokenizer_bridge-macos-arm64.dylib";
+                String macosX64Lib = "libjava_tokenizer_bridge-macos-x64.dylib";
+                ClasspathResources.copyToLocalFS("/libs/" + macosArmLib, new File(libsCacheDir, macosArmLib));
+                ClasspathResources.copyToLocalFS("/libs/" + macosX64Lib, new File(libsCacheDir, macosX64Lib));
             } catch (IOException e) {
                 logger.warn("dynamic lib exists, ignore copy.");
             }
         } catch (IOException e) {
-            logger.warn("fails to extract dynamic libs to local cache dir: {}", e.toString());
+            logger.warn("fails to make local cache libs dir: {}", e.toString());
         }
 
 
