@@ -1,6 +1,6 @@
 # Intro
 
-This is a java wrapper to hugging face tokenizer(rust), currently, only macos dylib included in the distribution jar. (for my own use)
+This is a java wrapper to hugging face tokenizer(rust), currently, only macos dylib included in the distribution jar. (for my own use to static embedding model -> [https://huggingface.co/sentence-transformers/static-similarity-mrl-multilingual-v1](https://huggingface.co/sentence-transformers/static-similarity-mrl-multilingual-v1))
 
 # How to use?
 
